@@ -1,7 +1,38 @@
 local lsp = require('lsp-zero')
+local cmp = require('cmp')
+local lspConfig = require('lspconfig')
+
+lspConfig.metals.setup{}
+lspConfig.emmet_language_server.setup{}
+
 lsp.preset('recommended')
 
-lsp.setup()
+cmp.setup({
+  mapping = {
+    ['<S-tab>'] = cmp.mapping.select_prev_item(),
+    ['<tab>'] = cmp.mapping.select_next_item(),
+    -- ['<CR>'] = cmp.mapping.complete(),
+    ['<CR>'] = cmp.mapping.confirm({
+      behavior = cmp.ConfirmBehavior.Insert,
+      select = true,
+    }),
+  },
+  sources = {
+    {name = 'nvim_lsp'},
+    {name = 'buffer'},
+    {name = 'path'},
+    {name = 'luasnip'},
+  },
+  completion = {
+    completeopt = 'menu,menuone,noinsert',
+  },
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end,
+  },
+})
+
 vim.diagnostic.config({
   virtual_text = true,
   signs = true,
@@ -20,7 +51,7 @@ require('mason').setup({})
 require('mason-lspconfig').setup({
   -- Replace the language servers listed here 
   -- with the ones you want to install
-  ensure_installed = {'tsserver', 'svelte', 'html'},
+  ensure_installed = {'tsserver', 'svelte', 'html', 'scala'},
   handlers = {
     lsp.default_setup,
   },
